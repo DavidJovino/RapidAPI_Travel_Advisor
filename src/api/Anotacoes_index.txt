@@ -1,0 +1,69 @@
+import axios from 'axios';
+
+// Axios e a biblioteca que ajuda a fazer essas calls da API
+
+//no Rapid API, entrar no api List in boundary pois os parametros requeridos são bl_latitude, tr_latitude, bl_longitude, tr_longitude... eles escaneiam em qual latitud e longituidade estão dentro de um intervalo de 10km e 100km. e dão os resultados em um array. Copiar o código na canto direito e colar aqui.
+
+// Axios já tem o método automatico GET, então não precisa do method e o URL dá para colocar em uma constante.
+
+// Como nesse caso só usaremos a latitude e longitude, não precisa das outras opções
+
+// as header contem API Key, logo serao colocadas no .env
+
+const URL =
+  'https://travel-advisor.p.rapidapi.com/restaurants/list-in-boundary';
+
+const options = {
+  params: {
+    bl_latitude: '11.847676',
+    tr_latitude: '12.838442',
+    bl_longitude: '109.095887',
+    tr_longitude: '109.149359',
+  },
+  headers: {
+    'X-RapidAPI-Key': 'segredo',
+    'X-RapidAPI-Host': 'travel-advisor.p.rapidapi.com',
+  },
+};
+
+export  const getPlacesData = async (sw, ne) => {
+  try {
+    // dentro da try box geralmente temos a request, se a resquest for bem sucedida a código rodará normalmente, porém se falhar será enviado para o bloco catch error
+    const {
+      data: { data },
+    } = await axios.get(URL, options); // pega a resposta da API, agora precisamos saber de qual URL pegará a resposta, depois o que ela ira pegar, ou seja o segundo parâmetro, nesse caso sera options, uma vez que nela tem a latitude e longitude
+    return data; // Podemos retornar a resposta, mas não estamos interessados na resposta e sim na Data que esta dentro da resposta, então no const acima mudaremos para { data: { data }} e o data que esta dentro é os restaurantes, então o return ficara data
+
+    // Agora que temos a nossa função não sera mais const e sim export const para exportar a função e junto dela os dados que queremos retornar
+    // agora vem a pergunta, aonde chamaremos essa função? a resposta então é dentro do APP.js
+    // depois de importar o hetPlacesData from './api' vem a pergunta, como chamaremos a função? A resposta é, criaremos um useEffect, importamos do react primeiro e depois dentro da função arrow do app, colocar
+    // useEffect () ***** () significa uma função, e então chamaremos outra função dentro da função, ficaria então useEffect(() => {}, []) **** o [] no final da função significa dependency array, se deixar o dependency array vazio, significa que essa função vai ser executada apenas uma vez no começo da aplicação
+    //Como no momento é isso que queremos então usaremos a função getPlacesData(); dentro da função ou seja dentro do {} *** vamos prestar atenção em algumas coisas, a função getPlacesData() retorna alguma coisa, nesse caso, esta retornando data, então temos que setar a data no state
+    //Então importar useState no react e criar um use state field, ou seja const [places, setPlaces] = useState(); que dentro terá uma array vazia no momento
+    //Como a função getPlacesData() é uma função async terá então no useEffect() ter .then que tera uma callback function que terá a Data
+    //o que qeremos fazer então é simplesmente chamar o setPlaces e a data desses 'Places' logo então, teremos .then((data) => setPlaces(data));
+    // O que podemos fazer também é colocar um console.log(data); apenas para saber se deu fetch corretamente
+    //No site, se der inspect e for no console verá que alguns restaurantes são retornados, porém como a latitude e longitude estão setados como constante, logo não mudará os restaurantes, terá então que deixar eles dinâmicos, para fazer isso terá que passar algumas informações na função getPlacesData() que esta aqui e no App.js
+    //Vamos criar mais useState field, nesse caso sera para coordenadas
+    // const [coordinates, setCoordinates] = useState({});
+    // Nesse caso estamos usando um objeto vazio {}
+    // const [bounds, setBounds] = useState(null);
+    // Nesse caso os bounds são os 'scanners' do mapa e serão vazios, ou seja, temos as datas, mas não iremos popular elas, serao apenas vazias, provavelmente para testes
+    //Vamos então passar essas funções de set para o map lá embaixo como props
+    // Ficará então <Map {...props} /> ou seja
+    // <Map setCoordinates={setCoordinates} setBounds={setBounds} />
+    // como o Map usará a função então passaremos também coordinates={coordinates}
+    //Passando esses props, teremos que ir no Map.jsx e colocar os props na função map, os props são { setCoordnates, setBounds, coordinates }
+    // Então não precisaremos declarar coordenadas falsas, deletando a linha const coordinates = { lat: 0, lng: 0 };
+
+    // Agora vem a questão, como saberemos quando a coordenadas ou as bordas do mapa mudarem? E a Resposta é: o GoogleMapReact fará isso para a gente
+    // Chamando a função onChange colocando o e de evento, lá chamaremos o setCoordnates e dentro dele terá um objeto, no objeto terá lat e lng
+    // Ficará então onChange={(e) => { setCoordinates({ lat: e.center.lat, lng: e.center.lng}
+    //Mas como eu sei que esse evente tem as coordenadas?? a resposta é sempre dê console.log em tudo o que puder
+    //Mesmo dando certo, nunca ira repopular pois o getPlacesData esta com dependency array ou seja, ele só foi executado uma vez, para que ele seja executado varias vezes colocar no [] os valores [coodinates, bounds]
+    // isso resolve o problema, mas podemos ir além, quero que o usuário assim que ele entra, já setar as coordenadas que ele está, faremos isso com outro useEffect que será apenas executado uma vez
+    //precisamos do API do browser para pegar as coordenadas, então usaremos navigator.geolocation.getCurrentPosition(({ coords: {latitude, longitude} }) => { setCoordinates({lat: latitude, lng: longitude })}) para pegar as coordenadas
+  } catch (error) {
+    console.log(error);
+  }
+};
