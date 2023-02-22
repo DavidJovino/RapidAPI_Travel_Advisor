@@ -12,10 +12,19 @@ import {
 import PlaceDetails from '../PlaceDetails/PlaceDetails';
 import useStyles from './styles.js';
 
-const List = ({ places }) => {
+const List = ({ places, childClicked }) => {
   const classes = useStyles();
   const [type, setType] = useState('restaurants');
   const [rating, setRating] = useState('');
+  const [elRefs, setElRefs] = useState([]);
+
+  useEffect(() => {
+    const refs = Array(places.length)
+      .fill()
+      .map((_, i) => refs[i] || createRef());
+
+    setElRefs(refs);
+  }, [places]);
 
   return (
     <div className={classes.container}>
@@ -45,8 +54,12 @@ const List = ({ places }) => {
       </FormControl>
       <Grid container spacing={3} className={classes.list}>
         {places?.map((place, i) => (
-          <Grid item xs={12} /* sm={6} md={4} */ key={i}>
-            <PlaceDetails place={place} />
+          <Grid item key={i} xs={12} /* sm={6} md={4} */ key={i}>
+            <PlaceDetails
+              selected={Number(childClicked) === i}
+              refProp={elRefs[i]}
+              place={place}
+            />
           </Grid>
         ))}
       </Grid>
