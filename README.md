@@ -42,7 +42,7 @@ This application is built using the following technologies:
 
 Credits
 
-This application was built by JavaScriptMastery, I add Some features, like the stars and correct some bugs, like Website do not load if you not allow browser to get your location. The data used in this application is provided by RapidAPI
+This application was built by JavaScriptMastery, I add Some features and correct some bugs, like Website do not load if you not allow browser to get your location. The data used in this application is provided by RapidAPI
 License.
 
 This application is licensed under the MIT License.
