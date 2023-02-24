@@ -41,6 +41,9 @@ export default makeStyles((theme) => ({
   },
   toolbar: {
     display: 'flex',
+    color: 'white',
+    background:
+      'linear-gradient(180deg, rgba(20,9,138,1) 50%, rgba(75,69,252,1) 100%)',
     justifyContent: 'space-between',
   },
 }));
