@@ -8,14 +8,20 @@ import {
   FormControl,
   Select,
 } from '@material-ui/core';
-
+import ReactStars from 'react-rating-stars-component';
 import PlaceDetails from '../PlaceDetails/PlaceDetails';
 import useStyles from './styles.js';
 
-const List = ({ places, childClicked, isLoading }) => {
+const List = ({
+  places,
+  type,
+  setType,
+  rating,
+  setRating,
+  childClicked,
+  isLoading,
+}) => {
   const classes = useStyles();
-  const [type, setType] = useState('restaurants');
-  const [rating, setRating] = useState('');
   const [elRefs, setElRefs] = useState([]);
 
   useEffect(() => {
@@ -38,29 +44,35 @@ const List = ({ places, childClicked, isLoading }) => {
       ) : (
         <>
           <FormControl className={classes.formControl}>
-            <InputLabel>Type</InputLabel>
-            <Select value={type} onChange={(e) => setType(e.target.value)}>
+            <InputLabel id="type">Type</InputLabel>
+            <Select
+              id="type"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+            >
               <MenuItem value="restaurants">Restaurants</MenuItem>
               <MenuItem value="hotels">Hotels</MenuItem>
               <MenuItem value="attractions">Attractions</MenuItem>
             </Select>
           </FormControl>
           <FormControl className={classes.formControl}>
-            <InputLabel>Rating</InputLabel>
-            <Select
-              id="rating"
-              value={rating}
-              onChange={(e) => setRating(e.target.value)}
-            >
-              <MenuItem value="all">All</MenuItem>
-              <MenuItem value="3">Above 3.0</MenuItem>
-              <MenuItem value="4">Above 4.0</MenuItem>
-              <MenuItem value="4.5">Above 4.5</MenuItem>
-            </Select>
+            <InputLabel id="rating">
+              <ReactStars
+                count={5}
+                value={rating}
+                onChange={(rating) => setRating(rating)}
+                size={24}
+                isHalf={true}
+                emptyIcon={<i className="far fa-star"></i>}
+                halfIcon={<i className="fa fa-star-half-alt"></i>}
+                fullIcon={<i className="fa fa-star"></i>}
+                activeColor="#ffd700"
+              />
+            </InputLabel>
           </FormControl>
           <Grid container spacing={3} className={classes.list}>
             {places?.map((place, i) => (
-              <Grid item key={i} xs={12} /* sm={6} md={4} */ key={i}>
+              <Grid ref={elRefs[i]} item key={i} xs={12}>
                 <PlaceDetails
                   selected={Number(childClicked) === i}
                   refProp={elRefs[i]}
